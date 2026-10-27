@@ -38,7 +38,7 @@ grant execute on function public.is_admin() to authenticated;
 
 -- 3) LISTA DE ADMINS (TROQUE PELOS E-MAILS REAIS)
 insert into public.admins (email) values
-  ('leidandevstack@gmail.com'),
+  ('tiago@exemplo.com'),
   ('segundo.admin@exemplo.com')
 on conflict do nothing;
 
