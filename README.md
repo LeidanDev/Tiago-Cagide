@@ -18,7 +18,11 @@ Site estático (HTML, CSS e JavaScript) que usa o **Supabase** (plano gratuito) 
 2. Aguarde o projeto ficar pronto.
 
 ### 2. Criar as tabelas e regras de segurança
+<<<<<<< HEAD
 1. Abra `supabase/schema.sql` e, na seção 3 (lista de admins), troque os e-mails de exemplo pelos e-mails reais. Cada e-mail da lista é um admin.
+=======
+1. Abra `supabase/schema.sql` e troque `COLOQUE_O_EMAIL_DO_TIAGO@exemplo.com` pelo e-mail real do Tiago (aparece 6 vezes).
+>>>>>>> 8f54dbe6649d2cd611ae4a7f340663abb13f5d4c
 2. No Supabase, vá em **SQL Editor > New query**, cole o arquivo inteiro e clique em **Run**.
 
 ### 3. Criar o usuário do Tiago
@@ -62,8 +66,12 @@ Se mesmo assim ele perder o acesso: no Supabase, **Authentication > Users**, cli
 
 ## Limites do plano gratuito
 O Supabase gratuito oferece 1 GB de arquivos, o que comporta milhares de fotos já otimizadas. Projetos gratuitos sem uso por 7 dias podem ser pausados; basta reativar no painel.
+<<<<<<< HEAD
 
 ## Adicionar ou remover admins
 1. Crie o usuário em **Authentication > Users > Add user**, com **Auto Confirm User** marcado.
 2. No **SQL Editor**, rode `insert into public.admins (email) values ('novo@exemplo.com');`.
 3. Para remover o acesso: `delete from public.admins where email = 'fulano@exemplo.com';`.
+=======
+# Tiago-Cagide
+>>>>>>> 8f54dbe6649d2cd611ae4a7f340663abb13f5d4c

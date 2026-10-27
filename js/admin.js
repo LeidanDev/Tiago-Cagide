@@ -6,6 +6,7 @@
   function say(el, msg, bad) { el.textContent = msg; el.hidden = !msg; el.className = 'status' + (bad ? ' bad' : ''); }
 
   if (!window.API.configured) {
+<<<<<<< HEAD
     $('#boot').hidden = true;
     $('#login').hidden = false;
     var why = {
@@ -14,6 +15,10 @@
       config: 'Não foi possível iniciar o Supabase. Confira a URL e a chave em js/config.js.'
     }[window.API.initError] || 'Falta configurar o arquivo js/config.js (veja o README).';
     say($('#login-msg'), why, true);
+=======
+    $('#login').hidden = false;
+    say($('#login-msg'), 'Falta configurar o arquivo js/config.js (veja o README).', true);
+>>>>>>> 8f54dbe6649d2cd611ae4a7f340663abb13f5d4c
     $('#login-form button').disabled = true;
     return;
   }
@@ -22,7 +27,10 @@
   var pwdMode = null; // 'first' | 'change' | 'recovery'
 
   function view(n) {
+<<<<<<< HEAD
     $('#boot').hidden = true;
+=======
+>>>>>>> 8f54dbe6649d2cd611ae4a7f340663abb13f5d4c
     $('#login').hidden = n !== 'login';
     $('#panel').hidden = n !== 'panel';
     $('#pwd').hidden = n !== 'pwd';
@@ -207,7 +215,11 @@
     if (ev === 'INITIAL_SESSION' || ev === 'TOKEN_REFRESHED') return;
     setTimeout(function () { route(session, ev); }, 0);
   });
+<<<<<<< HEAD
   sb.auth.getSession()
     .then(function (r) { route(r.data.session, 'INITIAL_SESSION'); })
     .catch(function () { view('login'); say($('#login-msg'), 'Não foi possível conectar ao Supabase. Confira js/config.js e a conexão.', true); });
+=======
+  sb.auth.getSession().then(function (r) { route(r.data.session, 'INITIAL_SESSION'); });
+>>>>>>> 8f54dbe6649d2cd611ae4a7f340663abb13f5d4c
 })();

@@ -1,5 +1,6 @@
 (function () {
   var BUCKET = 'galeria';
+<<<<<<< HEAD
   var cfg = window.CONFIG || {};
   var url = String(cfg.SUPABASE_URL || '').trim();
   var key = String(cfg.SUPABASE_ANON_KEY || '').trim();
@@ -16,6 +17,10 @@
       catch (e) { initError = 'config'; }
     }
   }
+=======
+  var configured = !/COLE_AQUI/.test(window.CONFIG.SUPABASE_URL + window.CONFIG.SUPABASE_ANON_KEY);
+  var sb = configured ? window.supabase.createClient(window.CONFIG.SUPABASE_URL, window.CONFIG.SUPABASE_ANON_KEY) : null;
+>>>>>>> 8f54dbe6649d2cd611ae4a7f340663abb13f5d4c
 
   function publicUrl(path) {
     return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
@@ -33,5 +38,9 @@
     };
   }
 
+<<<<<<< HEAD
   window.API = { sb: sb, configured: configured && !!sb, initError: initError, BUCKET: BUCKET, listPhotos: listPhotos };
+=======
+  window.API = { sb: sb, configured: configured, BUCKET: BUCKET, listPhotos: listPhotos };
+>>>>>>> 8f54dbe6649d2cd611ae4a7f340663abb13f5d4c
 })();
