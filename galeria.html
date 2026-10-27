@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<title>Galeria — Tiago Cagide</title>
+</head>
+<body>
+<header class="wrap top">
+  <a class="logo" href="index.html">TIAGO<i>.</i>CAGIDE</a>
+  <nav class="nav" aria-label="Galerias"><a href="galeria.html?tipo=evolucoes" data-tipo="evolucoes">Evoluções</a><a href="galeria.html?tipo=atletas" data-tipo="atletas">Atletas</a></nav>
+  <a class="btn o s" href="index.html">Voltar ao site</a>
+</header>
+<main class="wrap" style="padding-top:32px;padding-bottom:96px">
+  <h1 id="g-title" class="sec" style="font-size:clamp(40px,6vw,64px);margin-bottom:32px">Galeria</h1>
+  <div class="grid" id="full-gallery" data-gallery="evolucoes"></div>
+</main>
+<footer class="foot">Tiago Cagide · Nutricionista e Personal Trainer</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/site.js"></script>
+</body>
+</html>
