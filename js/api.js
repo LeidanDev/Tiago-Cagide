@@ -18,6 +18,8 @@
   }
 
   function publicUrl(path) {
+    // fotos que ja estao no repositorio (src/assets/...) ou em outro endereco
+    if (/^(https?:)?\/\//.test(path) || path.indexOf('src/') === 0) return path;
     return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
   }
 
