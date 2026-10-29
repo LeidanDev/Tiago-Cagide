@@ -5,6 +5,15 @@
   function esc(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
   function say(el, msg, bad) { el.textContent = msg; el.hidden = !msg; el.className = 'status' + (bad ? ' bad' : ''); }
 
+  function reason(e) {
+    var m = String((e && e.message) || e || '');
+    if (/row-level security|policy|permission|not authorized|unauthorized|forbidden/i.test(m)) return 'sem permissão: confirme que o seu e-mail está na lista de admins e que o SQL foi executado';
+    if (/bucket not found/i.test(m)) return 'a pasta "galeria" não existe no Supabase: rode o SQL';
+    if (/schema cache|does not exist|relation/i.test(m)) return 'a tabela photos não existe: rode o SQL';
+    if (/invalid/i.test(m)) return 'imagem inválida';
+    return m.slice(0, 90) || 'erro desconhecido';
+  }
+
   if (!window.API.configured) {
     $('#boot').hidden = true;
     $('#login').hidden = false;
@@ -96,7 +105,7 @@
     for (var i = 0; i < list.length; i++) {
       var f = list[i];
       say($('#up-msg'), 'Enviando ' + (i + 1) + ' de ' + list.length + '…');
-      if (!/^image\/(jpeg|png|webp)$/.test(f.type) || f.size > 15 * 1024 * 1024) { fail.push(f.name); continue; }
+      if (!/^image\/(jpeg|png|webp)$/.test(f.type) || f.size > 15 * 1024 * 1024) { fail.push(f.name + ' (formato ou tamanho inválido)'); continue; }
       var path = tab + '/' + crypto.randomUUID() + '.jpg';
       try {
         var blob = await resize(f);
@@ -105,11 +114,11 @@
         var ins = await sb.from('photos').insert({ category: tab, path: path, caption: f.name.replace(/\.[^.]+$/, '') });
         if (ins.error) { await sb.storage.from(window.API.BUCKET).remove([path]); throw ins.error; }
         ok++;
-      } catch (e) { fail.push(f.name); }
+      } catch (e) { fail.push(f.name + ' (' + reason(e) + ')'); }
     }
     busy = false;
     var msg = ok + (ok === 1 ? ' foto adicionada.' : ' fotos adicionadas.');
-    if (fail.length) msg += ' Não enviamos: ' + fail.join(', ') + ' (use JPG, PNG ou WebP).';
+    if (fail.length) msg += ' Não enviamos: ' + fail.join('; ') + '.';
     say($('#up-msg'), msg, fail.length > 0);
     refresh();
   }
