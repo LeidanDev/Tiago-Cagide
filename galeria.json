@@ -1,0 +1,42 @@
+{
+  "evolucoes": [
+    { "path": "src/assets/evolucao5.jpeg" },
+    { "path": "src/assets/evolucao2.jpeg" },
+    { "path": "src/assets/evolucao6.jpeg" },
+    { "path": "src/assets/evolucao8.JPG" },
+    { "path": "src/assets/evolucao3.jpeg" },
+    { "path": "src/assets/evolucao4.jpeg" },
+    { "path": "src/assets/evolucao1.jpeg" },
+    { "path": "src/assets/evolucao9.JPG" },
+    { "path": "src/assets/evolucao7.jpeg" },
+    { "path": "src/assets/evolucao10.jpg" },
+    { "path": "src/assets/novoaluno.jpeg" },
+    { "path": "src/assets/evolucao11.jpeg" },
+    { "path": "src/assets/evolucao12.jpeg" },
+    { "path": "src/assets/evolucao13.jpeg" },
+    { "path": "src/assets/evolucao14.jpeg" },
+    { "path": "src/assets/evolucao15.jpeg" },
+    { "path": "src/assets/evolucao16.jpeg" },
+    { "path": "src/assets/evolucao17.JPG" }
+  ],
+  "atletas": [
+    { "path": "src/assets/atleta6.jpg" },
+    { "path": "src/assets/atleta1.jpeg" },
+    { "path": "src/assets/atleta3.jpeg" },
+    { "path": "src/assets/atleta4.jpeg" },
+    { "path": "src/assets/atleta5.jpeg" },
+    { "path": "src/assets/atleta2.jpeg" },
+    { "path": "src/assets/atleta7.JPG" },
+    { "path": "src/assets/atleta8.JPG" },
+    { "path": "src/assets/atleta9.jpg" },
+    { "path": "src/assets/atleta10.jpg" },
+    { "path": "src/assets/atleta11.jpg" },
+    { "path": "src/assets/atleta12.jpg" },
+    { "path": "src/assets/atleta13.jpg" },
+    { "path": "src/assets/atleta14.JPG" },
+    { "path": "src/assets/atleta15.JPG" },
+    { "path": "src/assets/atleta16.JPG" },
+    { "path": "src/assets/atleta17.JPG" },
+    { "path": "src/assets/atleta18.JPG" }
+  ]
+}
