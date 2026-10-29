@@ -5,13 +5,27 @@
   function esc(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
   function say(el, msg, bad) { el.textContent = msg; el.hidden = !msg; el.className = 'status' + (bad ? ' bad' : ''); }
 
-  function reason(e) {
-    var m = String((e && e.message) || e || '');
-    if (/row-level security|policy|permission|not authorized|unauthorized|forbidden/i.test(m)) return 'sem permissão: confirme que o seu e-mail está na lista de admins e que o SQL foi executado';
-    if (/bucket not found/i.test(m)) return 'a pasta "galeria" não existe no Supabase: rode o SQL';
-    if (/schema cache|does not exist|relation/i.test(m)) return 'a tabela photos não existe: rode o SQL';
-    if (/invalid/i.test(m)) return 'imagem inválida';
-    return m.slice(0, 90) || 'erro desconhecido';
+  var RAW = '';
+  function imgUrl(p) { return RAW + encodeURI(p); }
+
+  // Chama a funcao "galeria" no Supabase, que grava as fotos no GitHub
+  async function call(action, body) {
+    var r = await window.API.sb.functions.invoke('galeria', { body: Object.assign({ action: action }, body || {}) });
+    if (r.error) {
+      var msg = '';
+      try { var j = await r.error.context.json(); msg = j.error || ''; } catch (e) {}
+      throw new Error(msg || r.error.message || 'Falha ao falar com o servidor.');
+    }
+    return r.data;
+  }
+
+  function toB64(blob) {
+    return new Promise(function (res, rej) {
+      var fr = new FileReader();
+      fr.onload = function () { res(String(fr.result).split(',')[1]); };
+      fr.onerror = rej;
+      fr.readAsDataURL(blob);
+    });
   }
 
   if (!window.API.configured) {
@@ -65,21 +79,22 @@
 
   async function refresh() {
     try {
-      var r = await window.API.listPhotos(tab);
-      items = r.items;
+      var d = await call('list');
+      RAW = 'https://raw.githubusercontent.com/' + d.owner + '/' + d.repo + '/' + d.branch + '/';
+      items = d.photos[tab] || [];
       say($('#list-msg'), '');
-    } catch (e) { items = []; say($('#list-msg'), 'Não foi possível carregar as fotos. Tente novamente.', true); }
+    } catch (e) { items = []; say($('#list-msg'), 'Não foi possível carregar as fotos: ' + e.message, true); }
     render();
   }
 
   function render() {
     $('#count').textContent = items.length + (items.length === 1 ? ' foto' : ' fotos') + ' em ' + (tab === 'evolucoes' ? 'Evoluções' : 'Atletas');
     $('#grid').innerHTML = items.length ? items.map(function (p) {
-      var c = pending === p.id;
-      return '<div class="card"><div class="shot"><img loading="lazy" src="' + esc(p.url) + '" alt="Foto enviada em ' +
-        new Date(p.created_at).toLocaleDateString('pt-BR') + '"></div><div class="cap"><span>' +
-        new Date(p.created_at).toLocaleDateString('pt-BR') + '</span><button type="button" class="del' + (c ? ' c' : '') +
-        '" data-del="' + p.id + '">' + (c ? 'Confirmar exclusão' : 'Excluir') + '</button></div></div>';
+      var c = pending === p.path;
+      var label = p.added ? new Date(p.added).toLocaleDateString('pt-BR') : p.path.split('/').pop();
+      return '<div class="card"><div class="shot"><img loading="lazy" src="' + esc(imgUrl(p.path)) + '" alt="Foto da galeria"></div><div class="cap"><span>' +
+        esc(label) + '</span><button type="button" class="del' + (c ? ' c' : '') +
+        '" data-del="' + esc(p.path) + '">' + (c ? 'Confirmar exclusão' : 'Excluir') + '</button></div></div>';
     }).join('') : '<p class="msg">Nenhuma foto ainda. Adicione a primeira acima.</p>';
   }
 
@@ -106,32 +121,26 @@
       var f = list[i];
       say($('#up-msg'), 'Enviando ' + (i + 1) + ' de ' + list.length + '…');
       if (!/^image\/(jpeg|png|webp)$/.test(f.type) || f.size > 15 * 1024 * 1024) { fail.push(f.name + ' (formato ou tamanho inválido)'); continue; }
-      var path = tab + '/' + crypto.randomUUID() + '.jpg';
       try {
-        var blob = await resize(f);
-        var up = await sb.storage.from(window.API.BUCKET).upload(path, blob, { contentType: 'image/jpeg', cacheControl: '31536000' });
-        if (up.error) throw up.error;
-        var ins = await sb.from('photos').insert({ category: tab, path: path, caption: f.name.replace(/\.[^.]+$/, '') });
-        if (ins.error) { await sb.storage.from(window.API.BUCKET).remove([path]); throw ins.error; }
+        var b64 = await toB64(await resize(f));
+        await call('add', { category: tab, image: b64 });
         ok++;
-      } catch (e) { fail.push(f.name + ' (' + reason(e) + ')'); }
+      } catch (e) { console.error('Erro no envio:', e); fail.push(f.name + ' (' + e.message + ')'); }
     }
     busy = false;
-    var msg = ok + (ok === 1 ? ' foto adicionada.' : ' fotos adicionadas.');
+    var msg = ok + (ok === 1 ? ' foto adicionada.' : ' fotos adicionadas.') + (ok ? ' Ela aparece no site em 1 a 3 minutos.' : '');
     if (fail.length) msg += ' Não enviamos: ' + fail.join('; ') + '.';
     say($('#up-msg'), msg, fail.length > 0);
     refresh();
   }
 
-  async function remove(id) {
-    var p = items.filter(function (x) { return x.id === id; })[0];
-    if (!p) return;
-    var d = await sb.from('photos').delete().eq('id', id);
-    if (d.error) { say($('#list-msg'), 'Não foi possível excluir. Tente novamente.', true); return; }
-    await sb.storage.from(window.API.BUCKET).remove([p.path]);
-    pending = null;
-    say($('#list-msg'), 'Foto excluída.');
-    refresh();
+  async function remove(path) {
+    try {
+      await call('remove', { category: tab, path: path });
+      pending = null;
+      say($('#list-msg'), 'Foto excluída. Ela some do site em 1 a 3 minutos.');
+    } catch (e) { say($('#list-msg'), 'Não foi possível excluir: ' + e.message, true); return; }
+    refresh().then(function () { say($('#list-msg'), 'Foto excluída. Ela some do site em 1 a 3 minutos.'); });
   }
 
   document.addEventListener('click', function (e) {

@@ -86,7 +86,4 @@ input[type=email],input[type=password]{width:100%;height:56px;padding:0 18px;bor
 
 .lnkbtn{align-self:flex-end;background:none;border:0;padding:0;color:var(--ac);font-weight:600;font-size:14px;cursor:pointer;text-decoration:underline}
 .field small{font-size:13px;color:#A9ADA6}
-<<<<<<< HEAD
 .boot{padding:56px 24px;text-align:center;color:var(--mu);font-size:16px}.boot.bad{color:var(--dg);font-weight:700}
-=======
->>>>>>> 8f54dbe6649d2cd611ae4a7f340663abb13f5d4c
