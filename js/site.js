@@ -8,6 +8,7 @@
   lb.innerHTML = '<img alt=""><button type="button" class="btn o s" aria-label="Fechar foto">Fechar</button>';
   document.body.appendChild(lb);
   lb.addEventListener('click', function (e) { if (e.target !== lb.querySelector('img')) lb.close(); });
+
   document.addEventListener('click', function (e) {
     var b = e.target.closest('.shot');
     if (!b) return;
@@ -17,34 +18,24 @@
     lb.showModal();
   });
 
-  function card(p, cat) {
-    var u = esc(encodeURI(p.path));
-    return '<button type="button" class="shot" data-url="' + u + '"><img loading="lazy" decoding="async" src="' + u +
-      '" alt="Foto de ' + LABEL[cat] + '"></button>';
-  }
-
-  var manifest = null;
-  function load() {
-    if (!manifest) {
-      manifest = fetch('galeria.json', { cache: 'no-cache' }).then(function (r) {
-        if (!r.ok) throw new Error('galeria');
-        return r.json();
-      });
-    }
-    return manifest;
+  function card(p) {
+    return '<button type="button" class="shot" data-url="' + esc(p.url) + '"><img loading="lazy" decoding="async" src="' +
+      esc(p.url) + '" alt="Foto de ' + LABEL[p.category] + '"></button>';
   }
 
   async function fill(box) {
     var cat = box.getAttribute('data-gallery');
     var limit = parseInt(box.getAttribute('data-limit') || '0', 10) || 0;
+    if (!window.API.configured) {
+      box.innerHTML = '<p class="msg">Configure o arquivo js/config.js para carregar as fotos.</p>';
+      return;
+    }
     box.setAttribute('aria-busy', 'true');
     try {
-      var m = await load();
-      var list = m[cat] || [];
-      var shown = limit ? list.slice(0, limit) : list;
-      box.innerHTML = shown.length ? shown.map(function (p) { return card(p, cat); }).join('') : '<p class="msg">Em breve novas fotos por aqui.</p>';
+      var r = await window.API.listPhotos(cat, limit);
+      box.innerHTML = r.items.length ? r.items.map(card).join('') : '<p class="msg">Em breve novas fotos por aqui.</p>';
       document.querySelectorAll('[data-count="' + cat + '"]').forEach(function (el) {
-        el.textContent = list.length + (list.length === 1 ? ' foto' : ' fotos');
+        el.textContent = r.total + (r.total === 1 ? ' foto' : ' fotos');
       });
     } catch (err) {
       box.innerHTML = '<p class="msg">Não foi possível carregar as fotos agora. Atualize a página em instantes.</p>';
